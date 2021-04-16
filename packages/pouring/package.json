@@ -1,0 +1,69 @@
+{
+    "name": "@daysful/pouring",
+    "version": "0.0.0-0",
+    "description": "Bio-Chemical Scripting Language",
+    "keywords": [
+        "pouring"
+    ],
+    "author": "ly3xqhl8g9 <ly3xqhl8g9@plurid.com> (https://plurid.com)",
+    "license": "SEE LICENSE IN LICENSE",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/daysful/pouring"
+    },
+    "bugs": {
+        "email": "source@daysful.com",
+        "url": "https://github.com/daysful/pouring/issues"
+    },
+    "homepage": "https://github.com/daysful/pouring/tree/master/packages/pouring/README.md",
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/",
+        "access": "public"
+    },
+    "engines": {
+        "node": ">=12",
+        "npm": ">=6"
+    },
+    "main": "distribution/index.js",
+    "module": "distribution/index.es.js",
+    "typings": "distribution/index.d.ts",
+    "bin": {
+        "pouring": "binder/pouring"
+    },
+    "files": [
+        "distribution",
+        "binder"
+    ],
+    "preferGlobal": false,
+    "scripts": {
+        "test": "jest -c configurations/jest.config.js ./source",
+        "test.suite": "jest -c configurations/jest.config.js",
+        "watch": "rollup -c scripts/rollup.config.js -w",
+        "clean": "bash scripts/clean.sh",
+        "build.cleanup": "bash scripts/cleanup.sh",
+        "build.production": "rollup -c scripts/rollup.config.js",
+        "build": "yarn clean && yarn build.production && yarn build.cleanup",
+        "prepublishOnly": "yarn build"
+    },
+    "dependencies": {
+        "commander": "^7.1.0",
+        "cross-fetch": "^3.0.6",
+        "encoding": "^0.1.13",
+        "sync-fetch": "^0.3.0"
+    },
+    "devDependencies": {
+        "@rollup/plugin-commonjs": "^17.1.0",
+        "@rollup/plugin-node-resolve": "^11.2.0",
+        "@types/jest": "^26.0.20",
+        "@types/node": "^14.14.31",
+        "@typescript-eslint/eslint-plugin": "^4.15.2",
+        "@typescript-eslint/parser": "^4.15.2",
+        "eslint": "^7.20.0",
+        "jest": "^26.6.3",
+        "rollup": "^2.39.1",
+        "rollup-plugin-sourcemaps": "^0.6.3",
+        "rollup-plugin-typescript2": "^0.30.0",
+        "ts-jest": "^26.5.2",
+        "typescript": "^4.2.2"
+    }
+}
