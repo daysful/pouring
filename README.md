@@ -50,3 +50,47 @@ let waterInstance = pour(
 ```
 
 `react`, `element`, `pour` are primitives
+
+
+```
+// Glucose - https://en.wikipedia.org/wiki/Glucose#/media/File:D-glucose-chain-2D-Fischer.png
+
+let glucoseComponent = react(
+    element('H'),
+    element('C'),
+    react(
+        element('O'),
+        element('H'),
+    ),
+)
+
+let glucose = react(
+    react(
+        element('H'),
+        element('C'),
+        element('O'),
+    ),
+
+    glucoseComponent,
+
+    react(
+        react(
+            element('H'),
+            element('O'),
+        ),
+        element('C'),
+        element('H'),
+    ),
+
+    glucoseComponent,
+
+    glucoseComponent,
+
+    react(
+        element('C'),
+        element('H', 2),
+        element('O'),
+        element('H'),
+    ),
+)
+```
