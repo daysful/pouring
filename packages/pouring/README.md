@@ -15,7 +15,7 @@
 
 
 <h3 align="center">
-    Bio-Chemical Scripting Language
+    Chemical Compiler
 </h3>
 
 
@@ -24,29 +24,68 @@
 
 
 
-`pouring` is a high-level language to model and automate the manufacturing of compounds
+`pouring` is a typed intermediate representation and compiler toolkit for
+chemical structures, reaction equations, material quantities, and reaction
+networks — targeting both the making of molecules and computing with them.
 
-`pouring` is intended to be
+The IR is language-neutral, with a canonical JSON encoding. This package is the
+TypeScript frontend: an embedded DSL that elaborates into that representation,
+plus the schema tooling around it. Chemical validation is delegated to an RDKit
+reference rather than reimplemented here.
 
-+ used by humans to experiment, test, play, design compounds;
-+ used by machines to manufacture compounds;
+
+
+## Status
+
+Early. The chemical IR is specified; the procedure and execution layers are not.
+Stereochemistry is unimplemented, so `pouring` cannot yet distinguish D-glucose
+from L-glucose, and therefore cannot yet specify a compound unambiguously.
 
 
 
 ## Syntax
 
-``` pouring
-// the abstract `H_2O`
-let waterCompound = react(
-    element('H'),
-    element('O', 2),
-)
+Molecules are graphs, so structure is a netlist — atoms are instances, bonds
+connect them by reference:
 
-// instantiated 1 unit of substance
-let waterInstance = pour(
-    waterCompound,
-    1,
-)
+``` ts
+// H₂O — two hydrogens on one oxygen
+const water = molecule('water', (m) => {
+    const o = m.atom('O');
+
+    m.bond(o, m.atom('H'));
+    m.bond(o, m.atom('H'));
+});
 ```
 
-`react`, `element`, `pour` are primitives
+A reaction transforms matter, and is a separate primitive from assembling a
+molecule:
+
+``` ts
+const acetylation = reaction('acetylation of salicylic acid', {
+    reactants: [salicylicAcid, aceticAnhydride],
+    products: [aspirin, aceticAcid],
+});
+```
+
+Quantities carry units, always:
+
+``` ts
+const sample = pour(water, 1, 'mol');
+```
+
+
+
+## What it does not do
+
+`pouring` establishes necessary conditions and never sufficient ones. A
+balanced, valence-valid route can still fail in a flask. A program that
+validates is not a prediction that a reaction works, and is not authorization
+to execute anything physically.
+
+
+
+## Documentation
+
++ [IR specification](https://github.com/daysful/pouring/blob/master/about/notes/ir-specification.md)
++ [Implementation-language decision](https://github.com/daysful/pouring/blob/master/about/notes/implementation-language.md)

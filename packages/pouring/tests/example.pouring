@@ -1,11 +1,29 @@
-// the abstract `H_2O`
-let waterCompound = react(
-    element('H'),
-    element('O', 2),
-)
+// NOTE: the `.pouring` surface syntax is not yet specified — see
+// about/notes/implementation-language.md. This file sketches intent only,
+// and is not parsed by anything today.
 
-// instantiated 1 unit of substance
-let waterInstance = pour(
-    waterCompound,
-    1,
-)
+
+// H₂O — two hydrogens on one oxygen.
+//
+// Written as a netlist: atoms are instances, bonds connect them by reference.
+// The previous version of this example placed the count on oxygen and so
+// described HO₂ rather than water.
+molecule water {
+    atom o = O
+
+    bond o -- H
+    bond o -- H
+}
+
+
+// Rings close because bonds are declared independently of atom order.
+molecule benzene {
+    atom ring[6] = C
+
+    ring ring order [2, 1, 2, 1, 2, 1]
+    fill H
+}
+
+
+// The unit is mandatory: one mole and one gram of water are different objects.
+aliquot sample = pour(water, 1 mol)
