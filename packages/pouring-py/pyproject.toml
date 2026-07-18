@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pouring"
+version = "0.0.1"
+description = "Chemical compiler — reference implementation of the pouring IR"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    { name = "ly3xqhl8g9", email = "ly3xqhl8g9@plurid.com" },
+]
+
+# No runtime dependencies, deliberately. The CRN slice runs with a bare
+# interpreter and no install step.
+#
+# Two dependencies are anticipated and not yet taken:
+#   rdkit  — structure, valence, aromaticity, stereo, canonicalisation.
+#            Per about/notes/implementation-language.md, chemistry semantics
+#            are delegated rather than reimplemented here.
+#   scipy  — stiff and large-network integration. The hand-rolled RK4 in
+#            simulate.py is ample for small non-stiff mass-action systems and
+#            nothing more.
+dependencies = []
+
+[project.optional-dependencies]
+chemistry = ["rdkit>=2024.3"]
+numerics = ["scipy>=1.11"]
+
+[tool.setuptools.packages.find]
+include = ["pouring*"]

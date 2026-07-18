@@ -56,18 +56,33 @@ syntax are all frontends that elaborate into the same checked representation.
 
 ## Status
 
-Early, and the honest summary is short: the chemical IR is specified, the
-procedure and execution layers are not, and there is no working implementation
-yet.
+Early. The chemical IR is specified; the procedure and execution layers are not.
 
-Stereochemistry is unimplemented. Until it lands, `pouring` cannot distinguish
-D-glucose from L-glucose — they have identical atoms, bonds, and formula — and
-therefore cannot yet specify a compound unambiguously.
-
-There is no hardware. That makes the computational target the nearer one: a
+There is no hardware, which makes the computational target the nearer one — a
 reaction network can be simulated, observed, and checked against what it claims
 to compute entirely in software, whereas a synthesis route cannot be verified
 without a lab.
+
+**The CRN target runs today.** [`packages/pouring-py`](./packages/pouring-py)
+takes a reaction network from definition through validation to both semantics
+and back out as a checked result, with no dependencies:
+
+``` bash
+cd packages/pouring-py
+python3 demo.py
+python3 -m unittest discover -s tests
+```
+
+The synthesis target covers structure, valence, stereochemistry, units,
+balancing, and route reachability. Valence verdicts come from an oracle that
+prefers RDKit and falls back to a labelled profile lint — chemistry authority
+is delegated by design rather than reimplemented.
+
+Stereochemistry now distinguishes enantiomers: D- and L-glucose share a
+formula, a mass, and every bond, and have different identities. What remains
+unimplemented is resonance, tautomer, and protonation normalisation, so a
+content hash means "the same annotated graph" rather than "the same chemical
+entity" — necessary for identity, not sufficient.
 
 See [the IR specification](./about/notes/ir-specification.md) and
 [the implementation-language decision](./about/notes/implementation-language.md).
