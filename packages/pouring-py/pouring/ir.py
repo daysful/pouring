@@ -403,8 +403,11 @@ class ReactionNetwork:
             "name": self.name,
             "species": [s.to_json() for s in self.species],
             "reactions": [r.to_json() for r in self.reactions],
-            "inputs": self.inputs,
-            "outputs": self.outputs,
+            # Normalised to float so the encoding is canonical whatever the
+            # caller passed in; otherwise `10` and `10.0` produce different
+            # documents for the same network and the round trip is lossy.
+            "inputs": {key: float(value) for key, value in self.inputs.items()},
+            "outputs": list(self.outputs),
             "semantics": self.semantics,
         }
 

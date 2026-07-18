@@ -27,12 +27,8 @@
     "main": "distribution/index.js",
     "module": "distribution/index.es.js",
     "typings": "distribution/index.d.ts",
-    "bin": {
-        "pouring": "binder/pouring"
-    },
     "files": [
-        "distribution",
-        "binder"
+        "distribution"
     ],
     "preferGlobal": false,
     "scripts": {

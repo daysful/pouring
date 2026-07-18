@@ -25,6 +25,10 @@ from pouring import (
     combustion,
     content_hash,
     convert,
+    dumps,
+    from_smiles,
+    loads,
+    round_trip,
     default_oracle,
     describe,
     formula,
@@ -36,6 +40,7 @@ from pouring import (
     molar_mass,
     potential_stereocenters,
     quantity,
+    Route,
     salicylic_acid,
     simulate_deterministic,
     simulate_stochastic,
@@ -115,6 +120,30 @@ def main() -> None:
     print(
         "\n  Benzene has a ring because bonds are declared independently of\n"
         "  atom order. A nested expression tree cannot represent one at all."
+    )
+
+    print("\n-- and they can be written the way chemists write them")
+    print()
+    for text, label in [
+        ("O", "water"),
+        ("c1ccccc1", "benzene"),
+        ("c1cc[nH]c1", "pyrrole"),
+        ("CC(=O)Oc1ccccc1C(=O)O", "aspirin"),
+    ]:
+        print(f"  {text:24} -> {describe(from_smiles(text, label))}")
+
+    print("\n  Both construction paths reach the same molecule:")
+    for text, built, label in [
+        ("c1ccccc1", benzene(), "benzene"),
+        ("C1=CC=CC=C1", benzene(), "benzene, Kekule input"),
+        ("CC(=O)Oc1ccccc1C(=O)O", aspirin(), "aspirin"),
+    ]:
+        agree = content_hash(from_smiles(text)) == content_hash(built)
+        print(f"    {label:24} {agree}")
+
+    print(
+        "\n  Aromatic input is resolved to alternating bond orders on the way\n"
+        "  in, or refused. The IR has no aromatic bond kind to hide behind."
     )
 
     print("\n-- valence is checked, and radicals must be declared")
@@ -282,6 +311,50 @@ def main() -> None:
         "  fraction of the time; by 100 it is nearly certain. Two readings\n"
         "  of one network, disagreeing exactly where the spec says they do."
     )
+
+    # ---------------------------------------------------------------- 8
+    rule("8. Interchange: the encoding reads back")
+
+    document = Document(target_profile=CRN, body=autocatalysis())
+    print()
+    for line in dumps(document).splitlines()[:16]:
+        print(f"  {line}")
+    print("  ...")
+
+    print("\n  Encode, decode, encode again — identical for every body type:")
+    for label, body, profile in [
+        ("reaction network", autocatalysis(), CRN),
+        ("synthesis route", aspirin_synthesis(), SYNTHESIS),
+    ]:
+        original = Document(target_profile=profile, body=body)
+        stable = dumps(original) == dumps(round_trip(original))
+        print(f"    {label:20} {stable}")
+
+    glucose_document = Document(
+        target_profile=SYNTHESIS,
+        body=Route(
+            id="probe",
+            name="probe",
+            target=glucose().id,
+            starting_materials=[glucose().id],
+            species=[glucose()],
+            reactions=[],
+        ),
+    )
+    recovered = round_trip(glucose_document).body.species[0]
+    print(
+        f"    {'stereo preserved':20} "
+        f"{content_hash(recovered) == content_hash(glucose())}"
+    )
+
+    print(
+        "\n  A configuration lost in transit would make the molecule that\n"
+        "  arrives a different claim from the one that was sent."
+    )
+
+    print("\n-- malformed input is diagnosed, not raised")
+    _, problems = loads('{"schemaVersion": "9.9.9"}')
+    report(problems)
 
 
 if __name__ == "__main__":

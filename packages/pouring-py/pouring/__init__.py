@@ -22,6 +22,13 @@ from .balance import (
     suggested_coefficients,
 )
 from .build import MoleculeBuilder, molecule
+from .codec import (
+    decode_document,
+    dumps,
+    encode_document,
+    loads,
+    round_trip,
+)
 from .canonical import (
     canonical_encoding,
     canonical_order,
@@ -93,6 +100,8 @@ from .networks import (
     sodium_chloride,
     water,
 )
+from .smiles import parse as parse_smiles
+from .smiles import parse_or_raise as from_smiles
 from .simulate import (
     Trajectory,
     simulate,
@@ -193,6 +202,14 @@ __all__ = [
     "find_rings",
     "perceive_aromatic_bonds",
     "same_structure",
+    # codec
+    "decode_document",
+    "encode_document",
+    "loads",
+    "dumps",
+    "round_trip",
+    "parse_smiles",
+    "from_smiles",
     # balance
     "BalanceResult",
     "balance",

@@ -91,50 +91,60 @@ See [the IR specification](./about/notes/ir-specification.md) and
 
 ## Syntax
 
-Molecules are graphs, not trees, so structure is written as a netlist: atoms are
-instances, and bonds connect them by reference.
+Structures can be written the way chemists write them:
 
-``` ts
-// H₂O — two hydrogens on one oxygen
-const water = molecule('water', (m) => {
-    const o = m.atom('O');
+``` python
+from pouring import from_smiles
 
-    m.bond(o, m.atom('H'));
-    m.bond(o, m.atom('H'));
-});
+water   = from_smiles('O')
+benzene = from_smiles('c1ccccc1')
+aspirin = from_smiles('CC(=O)Oc1ccccc1C(=O)O')
 ```
 
-Because bonds are declared independently of the order atoms appear, rings close
-naturally — which a nested expression tree cannot express:
+Aromatic input is resolved to alternating bond orders on the way in, or
+refused — the IR has no aromatic bond kind to hide behind.
 
-``` ts
-const benzene = molecule('benzene', (m) => {
-    const ring = m.atoms('C', 6);
+Underneath, molecules are graphs rather than trees, so structure is a netlist:
+atoms are instances and bonds connect them by reference. Because bonds are
+declared independently of the order atoms appear, rings close naturally, which
+a nested expression tree cannot express:
 
-    m.ring(ring, [2, 1, 2, 1, 2, 1]);
-    m.fill('H');
-});
+``` python
+from pouring import molecule
+
+def define(m):
+    ring = m.atoms('C', 6)
+    m.ring(ring, [2, 1, 2, 1, 2, 1])
+    m.fill('H')
+
+benzene = molecule('benzene', define)
 ```
+
+Both paths reach the same molecule — same canonical form, same content hash.
 
 A reaction is a transformation of matter. It is not a way to assemble a
 molecule, and the two are different primitives:
 
-``` ts
-const acetylation = reaction('acetylation of salicylic acid', {
-    reactants: [salicylicAcid, aceticAnhydride],
-    products: [aspirin, aceticAcid],
-    conditions: {
-        temperature: quantity(90, 'degC'),
-        catalyst: sulfuricAcid,
-    },
-});
+``` python
+acetylation = Reaction(
+    id='acetylation',
+    name='acetylation of salicylic acid',
+    reactants=[participant('salicylic-acid'), participant('acetic-anhydride')],
+    products=[participant('aspirin'), participant('acetic-acid')],
+    conditions=Conditions(
+        temperature=quantity('90', 'degC'),
+        catalyst='sulfuric acid',
+    ),
+)
 ```
 
 Quantities carry units, always. One mole and one gram of water are different
-objects:
+objects, and `quantity('90', 'degC')` converts affinely rather than by scaling:
 
-``` ts
-const sample = pour(water, 1, 'mol');
+``` python
+convert(quantity('90', 'degC'), 'K')     # 363.15 K
+convert(quantity('1', 'barg'), 'bar')    # 2.01325 bar absolute
+convert(quantity('5', 'g'), 'mL')        # rejected: mass is not volume
 ```
 
 
